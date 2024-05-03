@@ -37,7 +37,6 @@ local esp = {
         healthtext = {enabled = false, outline = true, color = Color3fromRGB(255, 255, 255)},
         distance = {enabled = false, outline = true, color = Color3fromRGB(255, 255, 255)},
         viewangle = {enabled = false, size = 6, color = Color3fromRGB(255, 255, 255)},
-        skeleton = {enabled = false, color = Color3fromRGB(255, 255, 255)},
         tracer = {enabled = false, origin = "Middle", color = Color3fromRGB(255, 255, 255)},
         arrow = {enabled = false, radius = 100, size = 25, filled = false, transparency = 1, color = Color3fromRGB(255, 255, 255)}
     },
@@ -367,170 +366,14 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
-local function DrawLine()
-    local l = Drawing.new("Line")
-    l.Visible = false
-    l.From = Vector2.new(0, 0)
-    l.To = Vector2.new(1, 1)
-    l.Color = esp.settings.skeleton.color
-    l.Thickness = 1
-    l.Transparency = 1
-    return l
-end
-
-local function Skeletonesp(plr)
-    task.spawn(function()
-        repeat wait() until plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil
-        local limbs = {}
-        local R15 = (plr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15) and true or false
-        limbs = {
-            -- Spine
-            Head_UpperTorso = DrawLine(),
-            UpperTorso_LowerTorso = DrawLine(),
-            -- Left Arm
-            UpperTorso_LeftUpperArm = DrawLine(),
-            LeftUpperArm_LeftLowerArm = DrawLine(),
-            LeftLowerArm_LeftHand = DrawLine(),
-            -- Right Arm
-            UpperTorso_RightUpperArm = DrawLine(),
-            RightUpperArm_RightLowerArm = DrawLine(),
-            RightLowerArm_RightHand = DrawLine(),
-            -- Left Leg
-            LowerTorso_LeftUpperLeg = DrawLine(),
-            LeftUpperLeg_LeftLowerLeg = DrawLine(),
-            LeftLowerLeg_LeftFoot = DrawLine(),
-            -- Right Leg
-            LowerTorso_RightUpperLeg = DrawLine(),
-            RightUpperLeg_RightLowerLeg = DrawLine(),
-            RightLowerLeg_RightFoot = DrawLine(),
-        }
-        local function Visibility(state)
-            for i, v in pairs(limbs) do
-                v.Visible = state
-            end
-        end
-
-        local function Colorize(color)
-            for i, v in pairs(limbs) do
-                v.Color = color
-            end
-        end
-
-        local function UpdaterR15()
-            local connection
-            connection = game:GetService("RunService").RenderStepped:Connect(function()
-                if plr.Character ~= nil and plr.Character:FindFirstChild("Humanoid") ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character.Humanoid.Health > 0 then
-                    local HUM, vis = camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
-                    if vis and esp.settings.skeleton.enabled and esp.enabled then
-                        -- Head
-                        local H = camera:WorldToViewportPoint(plr.Character.Head.Position)
-                        if limbs.Head_UpperTorso.From ~= Vector2.new(H.X, H.Y) then
-                            --Spine
-                            local UT = camera:WorldToViewportPoint(plr.Character.UpperTorso.Position)
-                            local LT = camera:WorldToViewportPoint(plr.Character.LowerTorso.Position)
-                            -- Left Arm
-                            local LUA = camera:WorldToViewportPoint(plr.Character.LeftUpperArm.Position)
-                            local LLA = camera:WorldToViewportPoint(plr.Character.LeftLowerArm.Position)
-                            local LH = camera:WorldToViewportPoint(plr.Character.LeftHand.Position)
-                            -- Right Arm
-                            local RUA = camera:WorldToViewportPoint(plr.Character.RightUpperArm.Position)
-                            local RLA = camera:WorldToViewportPoint(plr.Character.RightLowerArm.Position)
-                            local RH = camera:WorldToViewportPoint(plr.Character.RightHand.Position)
-                            -- Left leg
-                            local LUL = camera:WorldToViewportPoint(plr.Character.LeftUpperLeg.Position)
-                            local LLL = camera:WorldToViewportPoint(plr.Character.LeftLowerLeg.Position)
-                            local LF = camera:WorldToViewportPoint(plr.Character.LeftFoot.Position)
-                            -- Right leg
-                            local RUL = camera:WorldToViewportPoint(plr.Character.RightUpperLeg.Position)
-                            local RLL = camera:WorldToViewportPoint(plr.Character.RightLowerLeg.Position)
-                            local RF = camera:WorldToViewportPoint(plr.Character.RightFoot.Position)
-
-                            --Head
-                            limbs.Head_UpperTorso.From = Vector2.new(H.X, H.Y)
-                            limbs.Head_UpperTorso.To = Vector2.new(UT.X, UT.Y)
-
-                            --Spine
-                            limbs.UpperTorso_LowerTorso.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_LowerTorso.To = Vector2.new(LT.X, LT.Y)
-
-                            -- Left Arm
-                            limbs.UpperTorso_LeftUpperArm.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_LeftUpperArm.To = Vector2.new(LUA.X, LUA.Y)
-
-                            limbs.LeftUpperArm_LeftLowerArm.From = Vector2.new(LUA.X, LUA.Y)
-                            limbs.LeftUpperArm_LeftLowerArm.To = Vector2.new(LLA.X, LLA.Y)
-
-                            limbs.LeftLowerArm_LeftHand.From = Vector2.new(LLA.X, LLA.Y)
-                            limbs.LeftLowerArm_LeftHand.To = Vector2.new(LH.X, LH.Y)
-
-                            -- Right Arm
-                            limbs.UpperTorso_RightUpperArm.From = Vector2.new(UT.X, UT.Y)
-                            limbs.UpperTorso_RightUpperArm.To = Vector2.new(RUA.X, RUA.Y)
-
-                            limbs.RightUpperArm_RightLowerArm.From = Vector2.new(RUA.X, RUA.Y)
-                            limbs.RightUpperArm_RightLowerArm.To = Vector2.new(RLA.X, RLA.Y)
-
-                            limbs.RightLowerArm_RightHand.From = Vector2.new(RLA.X, RLA.Y)
-                            limbs.RightLowerArm_RightHand.To = Vector2.new(RH.X, RH.Y)
-
-                            -- Left Leg
-                            limbs.LowerTorso_LeftUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                            limbs.LowerTorso_LeftUpperLeg.To = Vector2.new(LUL.X, LUL.Y)
-
-                            limbs.LeftUpperLeg_LeftLowerLeg.From = Vector2.new(LUL.X, LUL.Y)
-                            limbs.LeftUpperLeg_LeftLowerLeg.To = Vector2.new(LLL.X, LLL.Y)
-
-                            limbs.LeftLowerLeg_LeftFoot.From = Vector2.new(LLL.X, LLL.Y)
-                            limbs.LeftLowerLeg_LeftFoot.To = Vector2.new(LF.X, LF.Y)
-
-                            -- Right Leg
-                            limbs.LowerTorso_RightUpperLeg.From = Vector2.new(LT.X, LT.Y)
-                            limbs.LowerTorso_RightUpperLeg.To = Vector2.new(RUL.X, RUL.Y)
-
-                            limbs.RightUpperLeg_RightLowerLeg.From = Vector2.new(RUL.X, RUL.Y)
-                            limbs.RightUpperLeg_RightLowerLeg.To = Vector2.new(RLL.X, RLL.Y)
-
-                            limbs.RightLowerLeg_RightFoot.From = Vector2.new(RLL.X, RLL.Y)
-                            limbs.RightLowerLeg_RightFoot.To = Vector2.new(RF.X, RF.Y)
-                        end
-
-                        Colorize(esp.settings.skeleton.color)
-
-                        if limbs.Head_UpperTorso.Visible ~= true then
-                            Visibility(true)
-                        end
-                    else 
-                        if limbs.Head_UpperTorso.Visible ~= false then
-                            Visibility(false)
-                        end
-                    end
-                else 
-                    if limbs.Head_UpperTorso.Visible ~= false then
-                        Visibility(false)
-                    end
-                    if game.Players:FindFirstChild(plr.Name) == nil then 
-                        for i, v in pairs(limbs) do
-                            v:Remove()
-                        end
-                        connection:Disconnect()
-                    end
-                end
-            end)
-        end
-        coroutine.wrap(UpdaterR15)()
-    end)
-end
-
 for _,v in ipairs(plrs:GetPlayers()) do
     if v ~= plr then
         esp.NewPlayer(v)
-        Skeletonesp(v)
     end
 end
 
 plrs.ChildAdded:Connect(function(v)
     esp.NewPlayer(v)
-    Skeletonesp(v)
 end)
 
 plrs.PlayerRemoving:Connect(function(v)
