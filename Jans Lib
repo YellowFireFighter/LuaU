@@ -3410,7 +3410,27 @@ function library:CreateWindow(name, size, hidebutton)
         function tab:CreateConfigSystem(side)
             local configSystem = { }
 
-            configSystem.configFolder = "FemWare"
+            if not isfile("Chronos.rip") then
+                makefolder("Chronos.rip")
+            end
+
+            if not isfile("Chronos.rip/" .. Game) then
+                makefolder("Chronos.rip/" .. Game)
+            end
+
+            if not isfile("Chronos.rip/".. Game .. "/Configs") then
+                makefolder("Chronos.rip/".. Game .. "/Configs")
+            end
+
+            if not isfile("Chronos.rip/Luas") then
+                makefolder("Chronos.rip/Luas")
+            end
+
+            if not isfile("Chronos.rip/Themes") then
+                makefolder("Chronos.rip/Themes")
+            end
+
+            configSystem.configFolder = "Chronos.rip/".. Game .. "/Configs"
             if (not isfolder(configSystem.configFolder)) then
                 makefolder(configSystem.configFolder)
             end
